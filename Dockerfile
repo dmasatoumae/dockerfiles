@@ -46,12 +46,15 @@ RUN cd /home  && \
       make install
 #ワークスペースの作成とrealsense-ros-wrapperのビルド
 
-RUN mkdir -p /root/catkin_ws/src
-RUN /bin/bash -c '. /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src && catkin_init_workspace /root/catkin_ws/src'
+RUN /bin/bash -c '. /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src && catkin_init_workspace && \
+      cd ~/catkin_ws/ && catkin_make '
+#root/catkin_ws/src'
 
 RUN cd .. && \
+      mkdir -p ~/catkin_ws/src/ && \
+      cd ~/catkin_ws/src/ && \
+#git clone https://github.com/pal-robotics/ddynamic_reconfigure.git && \
       git clone https://github.com/IntelRealSense/realsense-ros.git && \
-      git clone https://github.com/pal-robotics/ddynamic_reconfigure.git && \
       cd realsense-ros/ && \
       git checkout -b 2.2.4 refs/tags/2.2.4 && \
       cd ..
