@@ -1,8 +1,5 @@
 #runオプション
 #docker run -it --device=/dev/video0:/dev/video0 --device=/dev/video1:/dev/video1 --device=/dev/video2:/dev/video2 --device=/dev/video3:/dev/video3 --name ubuntu-rs -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix ubuntu-rs /bin/bash
-
-#docker run -it --rm --privileged --name {name} -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix {image_name} /bin/bash
-
 FROM ubuntu:16.04
 
 RUN apt-get update
@@ -26,6 +23,8 @@ RUN apt-get install ros-kinetic-desktop-full -y
 RUN rosdep init
 RUN rosdep update
 RUN ["/bin/bash", "-c", "source /opt/ros/kinetic/setup.bash"]
+#RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+#RUN ["/bin/bash", "-c", "source ~/.bashrc"]
 RUN apt-get install python-rosinstall -y
 #librealsense v2.22.0 build
 RUN apt-get install build-essential libgtk-3-dev -y
@@ -34,9 +33,10 @@ RUN cd /home  && \
       cd source && \
       git clone https://github.com/IntelRealSense/librealsense.git && \
       cd librealsense && \
-      git checkout -b 2.22.0 refs/tags/v2.22.0 && \
+      git checkout -b 2.18.1 refs/tags/v2.18.1 && \
+      mkdir -p /etc/udev/rules.d/ && \
       cp ./config/99-realsense-libusb.rules /etc/udev/rules.d/ && \
-      #udevadm control --reload-rules && udevadm trigger && \
+#udevadm control --reload-rules && udevadm trigger && \
       #./scripts/patch-realsense-ubuntu-lts.sh && \
       apt-get update -y && \
       mkdir build && \
@@ -45,23 +45,40 @@ RUN cd /home  && \
       make -j8 && \
       make install
 #ワークスペースの作成とrealsense-ros-wrapperのビルド
+#SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p /root/catkin_ws/src
 RUN /bin/bash -c '. /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src && catkin_init_workspace /root/catkin_ws/src'
 
+#RUN cd /root/catkin_ws/src/ &&\
+#      catkin_init_workspace
+
+#SHELL ["/bin/sh", "-c"]
+
+#RUN ["/bin/bash", "-c", "catkin_init_workspace"]
 RUN cd .. && \
       git clone https://github.com/IntelRealSense/realsense-ros.git && \
       git clone https://github.com/pal-robotics/ddynamic_reconfigure.git && \
       cd realsense-ros/ && \
-      git checkout -b 2.2.4 refs/tags/2.2.4 && \
+      git checkout -b 2.2.0 refs/tags/2.2.0 && \
       cd ..
 
+#SHELL ["/bin/bash", "-c"]
 RUN /bin/bash -c '. /opt/ros/kinetic/setup.bash; cd ~/catkin_ws; catkin_make clean && \
       catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release && \
       catkin_make install && \
       source ~/catkin_ws/devel/setup.bash'
+#RUN cd  &&\
+#      catkin_make clean && \
+#      catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release && \
+#      catkin_make install && \
+#      source ~/catkin_ws/devel/setup.bash 
+#SHELL ["/bin/sh", "-c"]
 
-
+#RUN ["/bin/bash", "-c", "catkin_make clean"]
+#RUN ["/bin/bash", "-c", "catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release"]
+#RUN ["/bin/bash", "-c", "catkin_make install"]
+#RUN ["/bin/bash", "-c", "source ~/catkin_ws/devel/setup.bash"]
 RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 RUN ["/bin/bash", "-c", "source ~/.bashrc"] 
