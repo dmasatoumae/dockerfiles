@@ -1,6 +1,6 @@
 #runオプション
 
-#docker run --runtime=nvidia --privileged --name {name} -it -v $HOME/work/projects:/projects -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e NVIDIA_DRIVVER_CAPABILITIES=all nvidia/cuda:10.1-devel-ubuntu18.04
+#docker run --runtime=nvidia --privileged --name {name} -it -v $HOME/work/projects:/projects -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e NVIDIA_DRIVER_CAPABILITIES=all nvidia/cuda:10.1-devel-ubuntu18.04
 
 FROM nvidia/cuda:10.1-devel-ubuntu18.04
 #インタラクティブな設定をしなくなる（＝入力待ちでブロックしなくなる）ので、自動インストールの際には便利
