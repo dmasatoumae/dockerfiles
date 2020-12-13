@@ -1,6 +1,5 @@
 # versiion
 ARG cuda_version=9.0
-# ARG cudnn_version=7
 ARG ubuntu_version=16.04
 ARG nvidia_cudnn_version=7.1.3.16-1+cuda9.0
 
@@ -18,6 +17,7 @@ FROM nvidia/cudagl:${cuda_version}-devel-ubuntu${ubuntu_version}
 # https://gitlab.com/nvidia/cuda/blob/ubuntu16.04/10.1/devel/cudnn7/Dockerfile
 ARG nvidia_cudnn_version
 ENV NVIDIA_CUDNN_VERSION=${nvidia_cudnn_version}
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcudnn7=${NVIDIA_CUDNN_VERSION} \
     libcudnn7-dev=${NVIDIA_CUDNN_VERSION} \
@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 RUN rosdep init 
 RUN rosdep update
 RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+RUN ["/bin/bash", "-c", "source /root/.bashrc"]
 
 # gnome-terminal
 RUN apt-get install -y dbus dbus-x11 language-pack-ja locales 
@@ -62,4 +63,25 @@ ENV LANGUAGE ja_JP:jp
 ENV LC_ALL ja_JP.UTF-8
 RUN echo 'eval `dbus-launch --sh-syntax`' >> /root/.bashrc 
 
+# ROS workspace settings
 
+#ENV $ROS_SRC_PATH = /root/catkin_ws/src
+#ENV $ROS_WS_PATH = /root/catkin_ws
+WORKDIR /root/catkin_ws/src
+RUN ["/bin/bash", "-c",  "source /opt/ros/kinetic/setup.bash; cd /root/catkin_ws/src; catkin_init_workspace"]
+WORKDIR /root/catkin_ws
+RUN ["/bin/bash", "-c",  "source /opt/ros/kinetic/setup.bash; cd /root/catkin_ws; catkin_make"]
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc
+RUN ["/bin/bash", "-c", "source /root/.bashrc"]
+WORKDIR /root/catkin_ws/src
+
+# burge_war settings
+RUN git clone https://github.com/dmasatoumae/burger_war.git
+RUN echo "export GAZEBO_MODEL_PATH=/root/catkin_ws/src/burger_war/burger_war/models/" >> /root/.bashrc
+RUN echo "export TURTLEBOT3_MODEL=burger" >> /root/.bashrc
+RUN ["/bin/bash", "-c", "source /root/.bashrc"]
+RUN apt-get install -y python-pip && pip install --upgrade pip && pip install requests flask 
+RUN apt-get update -y && apt-get install ros-kinetic-turtlebot3 ros-kinetic-turtlebot3-msgs ros-kinetic-turtlebot3-simulations ros-kinetic-aruco-ros -y
+WORKDIR /root/catkin_ws
+RUN ["/bin/bash", "-c",  "source /opt/ros/kinetic/setup.bash; cd /root/catkin_ws; catkin_make"]
+WORKDIR /root
