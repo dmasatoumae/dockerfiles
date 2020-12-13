@@ -54,8 +54,8 @@ RUN rosdep init
 RUN rosdep update
 RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 
-#下設定しないとgnome-terminalが使えなかった
-RUN apt-get install -y language-pack-ja locales 
+# gnome-terminal
+RUN apt-get install -y dbus dbus-x11 language-pack-ja locales 
 RUN locale-gen ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:jp

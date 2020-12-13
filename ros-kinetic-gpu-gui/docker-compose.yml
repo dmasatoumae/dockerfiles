@@ -1,7 +1,8 @@
 version: "2"
 services:
   ros-kinetic-gui:
-    image: ros:kinetic-gui-pana
+    image: ros:kinetic-cuda-gl
+    container_name: pana_opench
     build:
       context: .
       dockerfile: Dockerfile
