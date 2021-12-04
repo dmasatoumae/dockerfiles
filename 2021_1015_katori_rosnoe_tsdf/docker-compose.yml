@@ -1,0 +1,30 @@
+version: "2"
+services:
+  ros-noetic-nvidia-cudagl:
+    image: ros:20211015_katori_noetic_tsdf
+    container_name: katori_20211015_tsdf
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        cuda_version: 11.4
+        ubuntu_version: 20.04
+    runtime: nvidia
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: "host"
+    environment:
+      - DISPLAY
+      - XAUTHORITY
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_INDIRECT=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - $HOME/work/projects:/projects
+      - $HOME/work/share_rosnoe_tsdf/catkin_ws/src:/root/catkin_ws/src
+      - $HOME/work/share_rosnoe_tsdf/work:/root/work
+      - /mnt/sd/hdd_docker_share:/root/data/hdd_share
+      - /dev:/dev
+    command: /bin/bash

@@ -1,0 +1,29 @@
+version: "2"
+services:
+  ros-noetic-nvidia-cudagl:
+    image: ros:noetic-nvidia-cudagl
+    container_name: rosnoe_tsdf_usb
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        cuda_version: 11.4
+        ubuntu_version: 20.04
+    runtime: nvidia
+    stdin_open: true
+    tty: true
+    privileged: true
+    network_mode: "host"
+    environment:
+      - DISPLAY
+      - XAUTHORITY
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_INDIRECT=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - $HOME/work/projects:/projects
+      - $HOME/work/share_rosnoe_tsdf/catkin_ws/src:/root/catkin_ws/src
+      - $HOME/work/share_roscoe_tsdf/work:/root/work
+      - /dev:/dev
+    command: /bin/bash
